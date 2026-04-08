@@ -1,6 +1,7 @@
 package com.gametech.platform.modules.resource.controller;
 
 import com.gametech.platform.common.api.ApiResponse;
+import com.gametech.platform.common.support.OperatorContext;
 import com.gametech.platform.modules.resource.dto.DownloadResourceResponse;
 import com.gametech.platform.modules.resource.dto.ResourceResponse;
 import com.gametech.platform.modules.resource.service.ResourceService;
@@ -17,9 +18,11 @@ import java.util.List;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final OperatorContext operatorContext;
 
-    public ResourceController(ResourceService resourceService) {
+    public ResourceController(ResourceService resourceService, OperatorContext operatorContext) {
         this.resourceService = resourceService;
+        this.operatorContext = operatorContext;
     }
 
     @GetMapping
@@ -34,6 +37,7 @@ public class ResourceController {
 
     @PostMapping("/{id}/download")
     public ApiResponse<DownloadResourceResponse> download(@PathVariable Long id) {
+        operatorContext.requireLogin();
         return ApiResponse.successMessage("download logged", resourceService.download(id));
     }
 }

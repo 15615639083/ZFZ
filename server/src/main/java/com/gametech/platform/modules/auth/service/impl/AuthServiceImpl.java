@@ -2,7 +2,7 @@ package com.gametech.platform.modules.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gametech.platform.common.exception.BusinessException;
-import com.gametech.platform.common.util.IdGenerator;
+import com.gametech.platform.common.security.JwtTokenProvider;
 import com.gametech.platform.modules.auth.dto.LoginRequest;
 import com.gametech.platform.modules.auth.dto.LoginResponse;
 import com.gametech.platform.modules.auth.dto.RegisterRequest;
@@ -17,9 +17,11 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthServiceImpl(UserMapper userMapper) {
+    public AuthServiceImpl(UserMapper userMapper, JwtTokenProvider jwtTokenProvider) {
         this.userMapper = userMapper;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
         response.setUserId(user.getId());
         response.setUsername(user.getUsername());
         response.setRole(user.getRole());
-        response.setToken(IdGenerator.token("gtp_"));
+        response.setToken(jwtTokenProvider.generateToken(user.getId(), user.getRole(), user.getUsername()));
         return response;
     }
 

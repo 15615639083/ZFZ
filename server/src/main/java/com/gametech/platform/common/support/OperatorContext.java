@@ -1,5 +1,7 @@
 package com.gametech.platform.common.support;
 
+import com.gametech.platform.common.security.JwtTokenProvider;
+import com.gametech.platform.common.security.JwtUser;
 import com.gametech.platform.common.exception.BusinessException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -12,8 +14,19 @@ public class OperatorContext {
 
     private static final String USER_ID_HEADER = "X-User-Id";
     private static final String USER_ROLE_HEADER = "X-User-Role";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public OperatorContext(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     public Long getUserId() {
+        JwtUser jwtUser = resolveJwtUser();
+        if (jwtUser != null) {
+            return jwtUser.getUserId();
+        }
         HttpServletRequest request = request();
         if (request == null) {
             return 1L;
@@ -30,6 +43,10 @@ public class OperatorContext {
     }
 
     public String getRole() {
+        JwtUser jwtUser = resolveJwtUser();
+        if (jwtUser != null) {
+            return jwtUser.getRole();
+        }
         HttpServletRequest request = request();
         if (request == null) {
             return "user";
@@ -56,8 +73,41 @@ public class OperatorContext {
         return request.getRemoteAddr();
     }
 
+    public void requireLogin() {
+        HttpServletRequest request = request();
+        if (request == null) {
+            throw new BusinessException("please login first");
+        }
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            resolveJwtUser();
+            return;
+        }
+        String userId = request.getHeader(USER_ID_HEADER);
+        if (userId != null && !userId.trim().isEmpty()) {
+            return;
+        }
+        throw new BusinessException("please login first");
+    }
+
     private HttpServletRequest request() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return attributes == null ? null : attributes.getRequest();
+    }
+
+    private JwtUser resolveJwtUser() {
+        HttpServletRequest request = request();
+        if (request == null) {
+            return null;
+        }
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return null;
+        }
+        String token = authorization.substring(7).trim();
+        if (token.isEmpty()) {
+            return null;
+        }
+        return jwtTokenProvider.parseToken(token);
     }
 }

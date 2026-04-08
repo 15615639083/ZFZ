@@ -10,7 +10,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/gametech_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: 111111
   redis:
     host: 127.0.0.1
     port: 6379
@@ -29,6 +29,8 @@ logging:
 
 gametech:
   security:
-    enabled: false
+    enabled: true
+    jwt-secret: gametech-platform-jwt-secret-key-2026
+    token-expire-seconds: 604800
   storage:
     type: local

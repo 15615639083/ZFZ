@@ -1,8 +1,12 @@
 <template>
   <view class="page">
     <view class="hero">
-      <view class="title">GameTech Platform</view>
-      <view class="desc">资源分发与技术服务平台基础骨架</view>
+      <view class="title">{{ heroTitle }}</view>
+      <view class="desc">{{ heroDesc }}</view>
+    </view>
+    <view class="banner" v-for="item in banners" :key="item.title" @click="go(item.path)">
+      <view class="banner-title">{{ item.title }}</view>
+      <view class="banner-path">{{ item.path }}</view>
     </view>
     <view class="grid">
       <view class="card" @click="go('/pages/resource/index')">资源中心</view>
@@ -10,12 +14,35 @@
       <view class="card" @click="go('/pages/engineer/index')">工程师</view>
       <view class="card" @click="go('/pages/user/index')">我的</view>
     </view>
+    <view v-if="error" class="error">{{ error }}</view>
   </view>
 </template>
 
 <script>
+import { request } from '../../utils/request'
+
 export default {
+  data() {
+    return {
+      heroTitle: 'GameTech Platform',
+      heroDesc: '资源分发与技术服务平台基础骨架',
+      banners: [],
+      error: ''
+    }
+  },
+  onLoad() {
+    this.load()
+  },
   methods: {
+    async load() {
+      try {
+        const data = await request('/api/front/index')
+        this.banners = data.banner || []
+        this.heroDesc = '游戏资源、安全下载与工程师技术服务对接'
+      } catch (error) {
+        this.error = error.message
+      }
+    },
     go(url) {
       uni.navigateTo({ url })
     }
@@ -55,6 +82,24 @@ export default {
   margin-top: 32rpx;
 }
 
+.banner {
+  margin-top: 24rpx;
+  padding: 28rpx;
+  border-radius: 20rpx;
+  background: #fff;
+}
+
+.banner-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.banner-path {
+  margin-top: 8rpx;
+  color: #64748b;
+  font-size: 24rpx;
+}
+
 .card {
   padding: 40rpx 24rpx;
   border-radius: 20rpx;
@@ -63,5 +108,10 @@ export default {
   font-size: 30rpx;
   font-weight: 600;
   color: #111827;
+}
+
+.error {
+  margin-top: 24rpx;
+  color: #b91c1c;
 }
 </style>

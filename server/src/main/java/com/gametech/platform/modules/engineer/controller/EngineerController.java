@@ -35,11 +35,13 @@ public class EngineerController {
 
     @GetMapping("/api/front/engineer/me")
     public ApiResponse<EngineerProfileResponse> current() {
+        operatorContext.requireLogin();
         return ApiResponse.success(engineerService.current());
     }
 
     @PostMapping("/api/front/engineer/apply")
     public ApiResponse<Map<String, Object>> apply(@Validated @RequestBody EngineerApplyRequest request) {
+        operatorContext.requireLogin();
         Long engineerId = engineerService.apply(request);
         Map<String, Object> data = new HashMap<>();
         data.put("engineerId", engineerId);

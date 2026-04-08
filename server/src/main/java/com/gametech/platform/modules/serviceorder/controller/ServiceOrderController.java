@@ -28,21 +28,25 @@ public class ServiceOrderController {
 
     @PostMapping("/api/front/service-orders")
     public ApiResponse<ServiceOrderResponse> create(@Validated @RequestBody CreateServiceOrderRequest request) {
+        operatorContext.requireLogin();
         return ApiResponse.successMessage("service order created", serviceOrderService.create(request));
     }
 
     @GetMapping("/api/front/service-orders")
     public ApiResponse<List<ServiceOrderResponse>> list() {
+        operatorContext.requireLogin();
         return ApiResponse.success(serviceOrderService.listByCurrentUser());
     }
 
     @PostMapping("/api/front/service-orders/{id}/pay")
     public ApiResponse<ServiceOrderResponse> pay(@PathVariable Long id) {
+        operatorContext.requireLogin();
         return ApiResponse.successMessage("order paid", serviceOrderService.pay(id));
     }
 
     @PostMapping("/api/front/service-orders/{id}/confirm")
     public ApiResponse<ServiceOrderResponse> confirm(@PathVariable Long id) {
+        operatorContext.requireLogin();
         return ApiResponse.successMessage("order completed", serviceOrderService.confirm(id));
     }
 
