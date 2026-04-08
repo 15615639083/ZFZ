@@ -13,13 +13,19 @@ public class EngineerProfile {
     private Long id;
     private Long userId;
     private String realName;
+    private String idCardMask;
+    private String certificates;
     private String skills;
     private String serviceTags;
     private String intro;
-    private String verifyStatus;
+    private BigDecimal hourlyPrice;
+    private String verificationStatus;
+    private String verificationRemark;
     private String onlineStatus;
     private BigDecimal rating;
     private Integer completedOrderCount;
+    private Long reviewedBy;
+    private LocalDateTime reviewedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -47,6 +53,22 @@ public class EngineerProfile {
         this.realName = realName;
     }
 
+    public String getIdCardMask() {
+        return idCardMask;
+    }
+
+    public void setIdCardMask(String idCardMask) {
+        this.idCardMask = idCardMask;
+    }
+
+    public String getCertificates() {
+        return certificates;
+    }
+
+    public void setCertificates(String certificates) {
+        this.certificates = certificates;
+    }
+
     public String getSkills() {
         return skills;
     }
@@ -71,12 +93,28 @@ public class EngineerProfile {
         this.intro = intro;
     }
 
-    public String getVerifyStatus() {
-        return verifyStatus;
+    public BigDecimal getHourlyPrice() {
+        return hourlyPrice;
     }
 
-    public void setVerifyStatus(String verifyStatus) {
-        this.verifyStatus = verifyStatus;
+    public void setHourlyPrice(BigDecimal hourlyPrice) {
+        this.hourlyPrice = hourlyPrice;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public String getVerificationRemark() {
+        return verificationRemark;
+    }
+
+    public void setVerificationRemark(String verificationRemark) {
+        this.verificationRemark = verificationRemark;
     }
 
     public String getOnlineStatus() {
@@ -101,6 +139,22 @@ public class EngineerProfile {
 
     public void setCompletedOrderCount(Integer completedOrderCount) {
         this.completedOrderCount = completedOrderCount;
+    }
+
+    public Long getReviewedBy() {
+        return reviewedBy;
+    }
+
+    public void setReviewedBy(Long reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
+
+    public LocalDateTime getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(LocalDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
     }
 
     public LocalDateTime getCreatedAt() {

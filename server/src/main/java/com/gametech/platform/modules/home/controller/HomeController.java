@@ -24,6 +24,7 @@ public class HomeController {
         data.put("wxChatIndependent", "false");
         data.put("categoryPageConfig", "default");
         data.put("isShowCategory", "true");
+        data.put("projectType", "game_resource_and_service_platform");
         data.put("banner", defaultBanner());
         data.put("platformMenus", defaultMenus());
         return ApiResponse.success(data);

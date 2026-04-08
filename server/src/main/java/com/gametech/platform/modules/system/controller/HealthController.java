@@ -17,7 +17,7 @@ public class HealthController {
         Map<String, Object> data = new HashMap<>();
         data.put("name", "gametech-platform-server");
         data.put("status", "UP");
-        data.put("stage", "skeleton");
+        data.put("stage", "mvp-backend");
         return ApiResponse.success(data);
     }
 }

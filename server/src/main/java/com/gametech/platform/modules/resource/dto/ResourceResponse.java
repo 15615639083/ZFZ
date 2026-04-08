@@ -8,8 +8,12 @@ public class ResourceResponse {
     private String title;
     private String description;
     private String categoryName;
+    private String coverUrl;
+    private String fileUrl;
+    private String fileHash;
     private BigDecimal price;
     private boolean free;
+    private String status;
     private int downloadCount;
 
     public Long getId() {
@@ -44,6 +48,30 @@ public class ResourceResponse {
         this.categoryName = categoryName;
     }
 
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -58,6 +86,14 @@ public class ResourceResponse {
 
     public void setFree(boolean free) {
         this.free = free;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getDownloadCount() {

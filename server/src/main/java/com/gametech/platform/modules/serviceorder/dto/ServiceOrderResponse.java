@@ -8,11 +8,13 @@ public class ServiceOrderResponse {
     private String orderNo;
     private Long userId;
     private Long engineerId;
+    private Long dispatcherAdminId;
     private String serviceTitle;
     private String requirementDesc;
     private BigDecimal price;
     private String status;
     private String payStatus;
+    private String dispatchRemark;
 
     public Long getId() {
         return id;
@@ -44,6 +46,14 @@ public class ServiceOrderResponse {
 
     public void setEngineerId(Long engineerId) {
         this.engineerId = engineerId;
+    }
+
+    public Long getDispatcherAdminId() {
+        return dispatcherAdminId;
+    }
+
+    public void setDispatcherAdminId(Long dispatcherAdminId) {
+        this.dispatcherAdminId = dispatcherAdminId;
     }
 
     public String getServiceTitle() {
@@ -84,5 +94,13 @@ public class ServiceOrderResponse {
 
     public void setPayStatus(String payStatus) {
         this.payStatus = payStatus;
+    }
+
+    public String getDispatchRemark() {
+        return dispatchRemark;
+    }
+
+    public void setDispatchRemark(String dispatchRemark) {
+        this.dispatchRemark = dispatchRemark;
     }
 }

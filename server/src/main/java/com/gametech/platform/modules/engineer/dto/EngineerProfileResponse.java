@@ -5,10 +5,14 @@ public class EngineerProfileResponse {
     private Long id;
     private Long userId;
     private String realName;
+    private String idCardMask;
+    private String certificates;
     private String skills;
     private String serviceTags;
     private String intro;
-    private String verifyStatus;
+    private double hourlyPrice;
+    private String verificationStatus;
+    private String verificationRemark;
     private String onlineStatus;
     private double rating;
     private int completedOrderCount;
@@ -37,6 +41,22 @@ public class EngineerProfileResponse {
         this.realName = realName;
     }
 
+    public String getIdCardMask() {
+        return idCardMask;
+    }
+
+    public void setIdCardMask(String idCardMask) {
+        this.idCardMask = idCardMask;
+    }
+
+    public String getCertificates() {
+        return certificates;
+    }
+
+    public void setCertificates(String certificates) {
+        this.certificates = certificates;
+    }
+
     public String getSkills() {
         return skills;
     }
@@ -61,12 +81,28 @@ public class EngineerProfileResponse {
         this.intro = intro;
     }
 
-    public String getVerifyStatus() {
-        return verifyStatus;
+    public double getHourlyPrice() {
+        return hourlyPrice;
     }
 
-    public void setVerifyStatus(String verifyStatus) {
-        this.verifyStatus = verifyStatus;
+    public void setHourlyPrice(double hourlyPrice) {
+        this.hourlyPrice = hourlyPrice;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public String getVerificationRemark() {
+        return verificationRemark;
+    }
+
+    public void setVerificationRemark(String verificationRemark) {
+        this.verificationRemark = verificationRemark;
     }
 
     public String getOnlineStatus() {

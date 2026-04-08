@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@TableName("service_order")
+@TableName("service_orders")
 public class ServiceOrder {
 
     @TableId
@@ -14,13 +14,18 @@ public class ServiceOrder {
     private String orderNo;
     private Long userId;
     private Long engineerId;
+    private Long dispatcherAdminId;
     private String serviceTitle;
     private String requirementDesc;
     private BigDecimal price;
     private String status;
     private String payStatus;
+    private String dispatchRemark;
+    private String deliveryNote;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime paidAt;
+    private LocalDateTime completedAt;
 
     public Long getId() {
         return id;
@@ -52,6 +57,14 @@ public class ServiceOrder {
 
     public void setEngineerId(Long engineerId) {
         this.engineerId = engineerId;
+    }
+
+    public Long getDispatcherAdminId() {
+        return dispatcherAdminId;
+    }
+
+    public void setDispatcherAdminId(Long dispatcherAdminId) {
+        this.dispatcherAdminId = dispatcherAdminId;
     }
 
     public String getServiceTitle() {
@@ -94,6 +107,22 @@ public class ServiceOrder {
         this.payStatus = payStatus;
     }
 
+    public String getDispatchRemark() {
+        return dispatchRemark;
+    }
+
+    public void setDispatchRemark(String dispatchRemark) {
+        this.dispatchRemark = dispatchRemark;
+    }
+
+    public String getDeliveryNote() {
+        return deliveryNote;
+    }
+
+    public void setDeliveryNote(String deliveryNote) {
+        this.deliveryNote = deliveryNote;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -108,5 +137,21 @@ public class ServiceOrder {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 }
