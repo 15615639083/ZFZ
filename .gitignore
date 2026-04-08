@@ -1,0 +1,17 @@
+# backend
+server/target/
+
+# admin
+admin/node_modules/
+admin/dist/
+
+# app
+app/unpackage/
+app/node_modules/
+
+# common
+.idea/
+.vscode/
+*.log
+*.tmp
+*.local

@@ -1,0 +1,45 @@
+package com.gametech.platform.modules.engineer.controller;
+
+import com.gametech.platform.common.api.ApiResponse;
+import com.gametech.platform.modules.engineer.dto.EngineerApplyRequest;
+import com.gametech.platform.modules.engineer.dto.EngineerProfileResponse;
+import com.gametech.platform.modules.engineer.service.EngineerService;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class EngineerController {
+
+    private final EngineerService engineerService;
+
+    public EngineerController(EngineerService engineerService) {
+        this.engineerService = engineerService;
+    }
+
+    @GetMapping("/api/front/engineers")
+    public ApiResponse<List<EngineerProfileResponse>> listApproved() {
+        return ApiResponse.success(engineerService.listApproved());
+    }
+
+    @PostMapping("/api/front/engineer/apply")
+    public ApiResponse<Map<String, Object>> apply(@Validated @RequestBody EngineerApplyRequest request) {
+        Long engineerId = engineerService.apply(request);
+        Map<String, Object> data = new HashMap<>();
+        data.put("engineerId", engineerId);
+        data.put("status", "pending");
+        return ApiResponse.successMessage("application submitted", data);
+    }
+
+    @GetMapping("/api/admin/engineers")
+    public ApiResponse<List<EngineerProfileResponse>> listAll() {
+        return ApiResponse.success(engineerService.listAll());
+    }
+}
