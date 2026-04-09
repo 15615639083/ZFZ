@@ -14,8 +14,13 @@
       <input v-model="form.phone" placeholder="请输入手机号" />
       <view class="label">邮箱</view>
       <input v-model="form.email" placeholder="请输入邮箱" />
-      <view class="label">头像链接</view>
-      <input v-model="form.avatar" placeholder="可填写头像 URL" />
+      <view class="label">头像</view>
+      <view class="avatar-row">
+        <image v-if="form.avatar" class="avatar-preview" :src="form.avatar" mode="aspectFill"></image>
+        <view v-else class="avatar-placeholder">未上传</view>
+        <button class="ghost" @click="chooseAvatar">上传头像</button>
+      </view>
+      <input v-model="form.avatar" placeholder="上传后会自动回填，也可手动填写 URL" />
       <button class="action" @click="submit">保存资料</button>
     </view>
 
@@ -24,7 +29,7 @@
 </template>
 
 <script>
-import { request, requireLogin } from '../../utils/request'
+import { request, requireLogin, uploadImage } from '../../utils/request'
 
 export default {
   data() {
@@ -99,6 +104,20 @@ export default {
       } catch (error) {
         this.error = error.message
       }
+    },
+    chooseAvatar() {
+      uni.chooseImage({
+        count: 1,
+        success: async (res) => {
+          try {
+            const uploaded = await uploadImage(res.tempFilePaths[0])
+            this.form.avatar = uploaded.url
+            uni.showToast({ title: '头像上传成功', icon: 'none' })
+          } catch (error) {
+            this.error = error.message
+          }
+        }
+      })
     }
   }
 }
@@ -112,6 +131,6 @@ export default {
 .panel { margin-top: 22rpx; padding: 28rpx; border-radius: 26rpx; background: #fff; box-shadow: 0 18rpx 46rpx rgba(15, 23, 42, 0.05); }
 .label { margin-top: 16rpx; margin-bottom: 10rpx; color: #334155; font-size: 26rpx; }
 input { width: 100%; min-height: 88rpx; padding: 20rpx; border-radius: 16rpx; background: #f8fafc; box-sizing: border-box; }
-.action { margin-top: 20rpx; border-radius: 999rpx; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+.avatar-row{display:flex;align-items:center;gap:18rpx}.avatar-preview,.avatar-placeholder{width:104rpx;height:104rpx;border-radius:28rpx;background:#eef2ff}.avatar-placeholder{display:flex;align-items:center;justify-content:center;color:#64748b;font-size:22rpx}.ghost{border-radius:999rpx;background:#e2e8f0;color:#0f172a}.action { margin-top: 20rpx; border-radius: 999rpx; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
 .error { margin-top: 20rpx; color: #b91c1c; }
 </style>

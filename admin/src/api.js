@@ -79,6 +79,10 @@ export function updateBanner(id, payload) {
   })
 }
 
+export function quickUpdateBanner(id, payload) {
+  return updateBanner(id, payload)
+}
+
 export function fetchUsers() {
   return request('/admin/users')
 }

@@ -1,5 +1,10 @@
 <template>
   <view class="page">
+    <view class="search-bar" @click="goSearch">
+      <view class="search-icon">搜</view>
+      <view class="search-placeholder">搜索资源、工程师或热门服务</view>
+    </view>
+
     <view class="hero-card">
       <view class="hero-copy">
         <view class="hero-badge">{{ hero.badgeText || '专业工程师在线待命' }}</view>
@@ -69,13 +74,15 @@
       <view class="engineer-card" v-for="item in featuredEngineers" :key="item.id">
         <view class="engineer-main">
           <view class="avatar-wrap">
-            <view class="avatar">{{ item.realName ? item.realName.slice(0, 1) : '工' }}</view>
+            <image v-if="item.avatar" class="avatar-image" :src="item.avatar" mode="aspectFill"></image>
+            <view v-else class="avatar">{{ item.realName ? item.realName.slice(0, 1) : '工' }}</view>
             <view class="avatar-badge">认证</view>
           </view>
           <view class="engineer-info">
             <view class="engineer-top">
-              <view class="engineer-name">软件工程师：{{ item.realName }}</view>
-              <view class="engineer-price">￥{{ item.hourlyPrice || 30 }}<text class="price-unit">起</text></view>
+            <view class="engineer-name">软件工程师：{{ item.realName }}</view>
+            <view class="engineer-level">认证工程师</view>
+            <view class="engineer-price">￥{{ item.hourlyPrice || 30 }}<text class="price-unit">起</text></view>
             </view>
             <view class="engineer-meta">{{ item.rating || 5 }} 分 | 已完成 {{ item.completedOrderCount || 0 }} 单</view>
             <view class="engineer-tags">{{ item.skills }}</view>
@@ -162,6 +169,9 @@ export default {
     splitTags(value) {
       return (value || '').split(/[，,\s]+/).filter(Boolean).slice(0, 3)
     },
+    goSearch() {
+      uni.navigateTo({ url: '/pages/index/search' })
+    },
     goService(title) {
       uni.navigateTo({ url: `/pages/service/index?serviceTitle=${encodeURIComponent(title)}` })
     },
@@ -185,6 +195,33 @@ export default {
   min-height: 100vh;
   padding: 24rpx 24rpx 40rpx;
   background: linear-gradient(180deg, #f6f8ff 0%, #ffffff 26%, #f6f9fd 100%);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 18rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  box-shadow: 0 16rpx 36rpx rgba(15, 23, 42, 0.05);
+}
+
+.search-icon {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 52rpx;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 22rpx;
+}
+
+.search-placeholder {
+  color: #94a3b8;
+  font-size: 24rpx;
 }
 
 .hero-card {
@@ -389,6 +426,13 @@ export default {
   font-weight: 700;
 }
 
+.avatar-image {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 28rpx;
+  background: #e2e8f0;
+}
+
 .avatar-badge {
   position: absolute;
   right: -6rpx;
@@ -410,6 +454,7 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 16rpx;
+  align-items: flex-start;
 }
 
 .engineer-name,
@@ -417,6 +462,16 @@ export default {
   font-size: 30rpx;
   font-weight: 700;
   color: #0f172a;
+}
+
+.engineer-level {
+  margin-top: 8rpx;
+  display: inline-flex;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #ecfdf5;
+  color: #16a34a;
+  font-size: 20rpx;
 }
 
 .engineer-price {

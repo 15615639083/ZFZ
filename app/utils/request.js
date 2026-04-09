@@ -90,3 +90,24 @@ export function request(url, method = 'GET', data) {
     })
   })
 }
+
+export function uploadImage(filePath) {
+  return new Promise((resolve, reject) => {
+    const token = getToken()
+    uni.uploadFile({
+      url: `${BASE_URL}/api/front/upload/image`,
+      filePath,
+      name: 'file',
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (res) => {
+        const body = JSON.parse(res.data || '{}')
+        if (res.statusCode !== 200 || body.code !== 200) {
+          reject(new Error(body.message || 'upload failed'))
+          return
+        }
+        resolve(body.data)
+      },
+      fail: (error) => reject(new Error(error.errMsg || 'upload failed'))
+    })
+  })
+}

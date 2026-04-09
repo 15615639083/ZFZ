@@ -4,6 +4,7 @@ public class EngineerProfileResponse {
 
     private Long id;
     private Long userId;
+    private String avatar;
     private String realName;
     private String idCardMask;
     private String certificates;
@@ -32,6 +33,14 @@ public class EngineerProfileResponse {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getRealName() {

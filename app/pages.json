@@ -31,6 +31,12 @@
       }
     },
     {
+      "path": "pages/index/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
       "path": "pages/auth/index",
       "style": {
         "navigationBarTitleText": "登录注册"

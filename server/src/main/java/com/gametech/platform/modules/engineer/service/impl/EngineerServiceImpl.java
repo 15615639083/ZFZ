@@ -189,8 +189,10 @@ public class EngineerServiceImpl implements EngineerService {
 
     private EngineerProfileResponse convert(EngineerProfile profile) {
         EngineerProfileResponse response = new EngineerProfileResponse();
+        User user = userMapper.selectById(profile.getUserId());
         response.setId(profile.getId());
         response.setUserId(profile.getUserId());
+        response.setAvatar(user == null ? "" : user.getAvatar());
         response.setRealName(profile.getRealName());
         response.setIdCardMask(profile.getIdCardMask());
         response.setCertificates(profile.getCertificates());
