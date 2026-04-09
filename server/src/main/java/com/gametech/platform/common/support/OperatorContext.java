@@ -3,6 +3,8 @@ package com.gametech.platform.common.support;
 import com.gametech.platform.common.security.JwtTokenProvider;
 import com.gametech.platform.common.security.JwtUser;
 import com.gametech.platform.common.exception.BusinessException;
+import com.gametech.platform.modules.user.entity.User;
+import com.gametech.platform.modules.user.mapper.UserMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -17,9 +19,11 @@ public class OperatorContext {
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserMapper userMapper;
 
-    public OperatorContext(JwtTokenProvider jwtTokenProvider) {
+    public OperatorContext(JwtTokenProvider jwtTokenProvider, UserMapper userMapper) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userMapper = userMapper;
     }
 
     public Long getUserId() {
@@ -81,6 +85,7 @@ public class OperatorContext {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
         if (authorization != null && authorization.startsWith("Bearer ")) {
             resolveJwtUser();
+            ensureUserActive();
             return;
         }
         String userId = request.getHeader(USER_ID_HEADER);
@@ -108,6 +113,20 @@ public class OperatorContext {
         if (token.isEmpty()) {
             return null;
         }
-        return jwtTokenProvider.parseToken(token);
+        JwtUser jwtUser = jwtTokenProvider.parseToken(token);
+        ensureUserActive(jwtUser.getUserId());
+        return jwtUser;
+    }
+
+    private void ensureUserActive() {
+        Long userId = getUserId();
+        ensureUserActive(userId);
+    }
+
+    private void ensureUserActive(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user != null && !"active".equalsIgnoreCase(user.getStatus())) {
+            throw new BusinessException("account is disabled");
+        }
     }
 }

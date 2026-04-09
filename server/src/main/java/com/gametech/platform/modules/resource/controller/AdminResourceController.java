@@ -7,6 +7,7 @@ import com.gametech.platform.modules.resource.dto.ResourceResponse;
 import com.gametech.platform.modules.resource.service.ResourceService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +37,12 @@ public class AdminResourceController {
     public ApiResponse<ResourceResponse> create(@Validated @RequestBody CreateResourceRequest request) {
         operatorContext.requireRole("admin");
         return ApiResponse.successMessage("resource created", resourceService.create(request));
+    }
+
+    @PostMapping("/{id}")
+    public ApiResponse<ResourceResponse> update(@PathVariable Long id,
+                                                @Validated @RequestBody CreateResourceRequest request) {
+        operatorContext.requireRole("admin");
+        return ApiResponse.successMessage("resource updated", resourceService.update(id, request));
     }
 }

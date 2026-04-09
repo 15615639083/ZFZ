@@ -1,0 +1,35 @@
+{
+  "name": "GameTech Platform",
+  "appid": "__UNI__GAMETECH_PLATFORM",
+  "description": "Game resource and technical service platform mini app.",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true,
+      "enhance": true
+    },
+    "usingComponents": true
+  },
+  "h5": {
+    "title": "GameTech Platform",
+    "router": {
+      "mode": "hash"
+    }
+  },
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    }
+  }
+}

@@ -16,6 +16,8 @@ public class User {
     private String passwordHash;
     private String role;
     private String status;
+    private String avatar;
+    private String realName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -73,6 +75,22 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 
     public LocalDateTime getCreatedAt() {

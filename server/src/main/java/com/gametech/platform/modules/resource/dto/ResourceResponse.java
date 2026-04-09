@@ -7,6 +7,7 @@ public class ResourceResponse {
     private Long id;
     private String title;
     private String description;
+    private String detailContent;
     private String categoryName;
     private String coverUrl;
     private String fileUrl;
@@ -15,6 +16,7 @@ public class ResourceResponse {
     private boolean free;
     private String status;
     private int downloadCount;
+    private boolean downloaded;
 
     public Long getId() {
         return id;
@@ -42,6 +44,14 @@ public class ResourceResponse {
 
     public String getCategoryName() {
         return categoryName;
+    }
+
+    public String getDetailContent() {
+        return detailContent;
+    }
+
+    public void setDetailContent(String detailContent) {
+        this.detailContent = detailContent;
     }
 
     public void setCategoryName(String categoryName) {
@@ -102,5 +112,13 @@ public class ResourceResponse {
 
     public void setDownloadCount(int downloadCount) {
         this.downloadCount = downloadCount;
+    }
+
+    public boolean isDownloaded() {
+        return downloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        this.downloaded = downloaded;
     }
 }

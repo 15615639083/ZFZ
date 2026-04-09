@@ -22,6 +22,9 @@ public class ServiceOrder {
     private String payStatus;
     private String dispatchRemark;
     private String deliveryNote;
+    private String deliveryAttachmentUrl;
+    private String rejectReason;
+    private String disputeReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime paidAt;
@@ -121,6 +124,30 @@ public class ServiceOrder {
 
     public void setDeliveryNote(String deliveryNote) {
         this.deliveryNote = deliveryNote;
+    }
+
+    public String getDeliveryAttachmentUrl() {
+        return deliveryAttachmentUrl;
+    }
+
+    public void setDeliveryAttachmentUrl(String deliveryAttachmentUrl) {
+        this.deliveryAttachmentUrl = deliveryAttachmentUrl;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public String getDisputeReason() {
+        return disputeReason;
+    }
+
+    public void setDisputeReason(String disputeReason) {
+        this.disputeReason = disputeReason;
     }
 
     public LocalDateTime getCreatedAt() {

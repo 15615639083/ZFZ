@@ -7,8 +7,11 @@ import com.gametech.platform.modules.engineer.entity.EngineerProfile;
 import com.gametech.platform.modules.engineer.mapper.EngineerProfileMapper;
 import com.gametech.platform.modules.engineer.dto.EngineerApplyRequest;
 import com.gametech.platform.modules.engineer.dto.EngineerProfileResponse;
+import com.gametech.platform.modules.engineer.dto.EngineerWorkbenchResponse;
 import com.gametech.platform.modules.engineer.dto.ReviewEngineerRequest;
 import com.gametech.platform.modules.engineer.service.EngineerService;
+import com.gametech.platform.modules.serviceorder.dto.ServiceOrderResponse;
+import com.gametech.platform.modules.serviceorder.service.ServiceOrderService;
 import com.gametech.platform.modules.user.entity.User;
 import com.gametech.platform.modules.user.mapper.UserMapper;
 import org.springframework.stereotype.Service;
@@ -24,17 +27,30 @@ public class EngineerServiceImpl implements EngineerService {
     private final EngineerProfileMapper engineerProfileMapper;
     private final UserMapper userMapper;
     private final OperatorContext operatorContext;
+    private final ServiceOrderService serviceOrderService;
 
     public EngineerServiceImpl(EngineerProfileMapper engineerProfileMapper, UserMapper userMapper,
-                               OperatorContext operatorContext) {
+                               OperatorContext operatorContext, ServiceOrderService serviceOrderService) {
         this.engineerProfileMapper = engineerProfileMapper;
         this.userMapper = userMapper;
         this.operatorContext = operatorContext;
+        this.serviceOrderService = serviceOrderService;
     }
 
     @Override
     public Long apply(EngineerApplyRequest request) {
         Long userId = operatorContext.getUserId();
+        User currentUser = userMapper.selectById(userId);
+        if (currentUser == null) {
+            throw new BusinessException("user not found");
+        }
+        if (currentUser.getRealName() == null || currentUser.getRealName().trim().isEmpty()) {
+            throw new BusinessException("please complete your real name before applying");
+        }
+        if ((currentUser.getPhone() == null || currentUser.getPhone().trim().isEmpty())
+                && (currentUser.getEmail() == null || currentUser.getEmail().trim().isEmpty())) {
+            throw new BusinessException("please complete phone or email before applying");
+        }
         EngineerProfile existing = engineerProfileMapper.selectOne(new LambdaQueryWrapper<EngineerProfile>()
                 .eq(EngineerProfile::getUserId, userId)
                 .last("limit 1"));
@@ -51,6 +67,7 @@ public class EngineerServiceImpl implements EngineerService {
         profile.setSkills(request.getSkills());
         profile.setServiceTags(request.getServiceTags());
         profile.setIntro(request.getIntro());
+        profile.setCaseExamples(request.getCaseExamples());
         profile.setHourlyPrice(request.getHourlyPrice() == null ? BigDecimal.ZERO : request.getHourlyPrice());
         profile.setVerificationStatus("pending");
         profile.setVerificationRemark("");
@@ -69,6 +86,41 @@ public class EngineerServiceImpl implements EngineerService {
                 .eq(EngineerProfile::getUserId, operatorContext.getUserId())
                 .last("limit 1"));
         return profile == null ? null : convert(profile);
+    }
+
+    @Override
+    public EngineerProfileResponse detail(Long engineerId) {
+        EngineerProfile profile = engineerProfileMapper.selectById(engineerId);
+        if (profile == null || !"approved".equalsIgnoreCase(profile.getVerificationStatus())) {
+            throw new BusinessException("engineer not found");
+        }
+        return convert(profile);
+    }
+
+    @Override
+    public EngineerWorkbenchResponse workbench() {
+        EngineerProfileResponse profile = current();
+        if (profile == null || !"approved".equalsIgnoreCase(profile.getVerificationStatus())) {
+            throw new BusinessException("engineer profile not approved");
+        }
+        List<ServiceOrderResponse> orders = serviceOrderService.listByCurrentEngineer();
+        EngineerWorkbenchResponse response = new EngineerWorkbenchResponse();
+        response.setProfile(profile);
+        response.setRecentOrders(orders.size() > 6 ? orders.subList(0, 6) : orders);
+        response.setTotalAssignedOrders(orders.size());
+        int processing = 0;
+        int completed = 0;
+        for (ServiceOrderResponse order : orders) {
+            if ("processing".equalsIgnoreCase(order.getStatus()) || "assigned".equalsIgnoreCase(order.getStatus())) {
+                processing++;
+            }
+            if ("completed".equalsIgnoreCase(order.getStatus())) {
+                completed++;
+            }
+        }
+        response.setProcessingOrders(processing);
+        response.setCompletedOrders(completed);
+        return response;
     }
 
     @Override
@@ -145,6 +197,7 @@ public class EngineerServiceImpl implements EngineerService {
         response.setSkills(profile.getSkills());
         response.setServiceTags(profile.getServiceTags());
         response.setIntro(profile.getIntro());
+        response.setCaseExamples(profile.getCaseExamples());
         response.setHourlyPrice(profile.getHourlyPrice() == null ? 0D : profile.getHourlyPrice().doubleValue());
         response.setVerificationStatus(profile.getVerificationStatus());
         response.setVerificationRemark(profile.getVerificationRemark());

@@ -18,6 +18,7 @@ public class EngineerProfile {
     private String skills;
     private String serviceTags;
     private String intro;
+    private String caseExamples;
     private BigDecimal hourlyPrice;
     private String verificationStatus;
     private String verificationRemark;
@@ -91,6 +92,14 @@ public class EngineerProfile {
 
     public void setIntro(String intro) {
         this.intro = intro;
+    }
+
+    public String getCaseExamples() {
+        return caseExamples;
+    }
+
+    public void setCaseExamples(String caseExamples) {
+        this.caseExamples = caseExamples;
     }
 
     public BigDecimal getHourlyPrice() {

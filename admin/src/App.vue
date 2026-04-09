@@ -5,14 +5,29 @@
       <router-link to="/">控制台</router-link>
       <router-link to="/engineers">工程师审核</router-link>
       <router-link to="/resources">资源管理</router-link>
+      <router-link to="/banners">Banner 配置</router-link>
       <router-link to="/orders">订单派单</router-link>
+      <router-link to="/users">用户管理</router-link>
       <router-link to="/login">登录</router-link>
+      <button class="logout" @click="logout">退出</button>
     </aside>
     <main class="content">
       <router-view />
     </main>
   </div>
 </template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+import { clearToken } from './api'
+
+const router = useRouter()
+
+function logout() {
+  clearToken()
+  router.push('/login')
+}
+</script>
 
 <style scoped>
 .shell {
@@ -47,6 +62,16 @@
 .sidebar a.router-link-active {
   background: #2563eb;
   color: #fff;
+}
+
+.logout {
+  margin-top: auto;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #334155;
+  color: #fff;
+  cursor: pointer;
 }
 
 .content {

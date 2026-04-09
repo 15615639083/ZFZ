@@ -8,7 +8,11 @@ import com.gametech.platform.modules.engineer.entity.EngineerProfile;
 import com.gametech.platform.modules.engineer.mapper.EngineerProfileMapper;
 import com.gametech.platform.modules.serviceorder.dto.CreateServiceOrderRequest;
 import com.gametech.platform.modules.serviceorder.dto.DispatchServiceOrderRequest;
+import com.gametech.platform.modules.serviceorder.dto.DisputeRequest;
+import com.gametech.platform.modules.serviceorder.dto.EngineerRejectOrderRequest;
+import com.gametech.platform.modules.serviceorder.dto.AcceptanceRejectRequest;
 import com.gametech.platform.modules.serviceorder.dto.ServiceOrderResponse;
+import com.gametech.platform.modules.serviceorder.dto.UpdateServiceOrderStatusRequest;
 import com.gametech.platform.modules.serviceorder.entity.ServiceOrder;
 import com.gametech.platform.modules.serviceorder.mapper.ServiceOrderMapper;
 import com.gametech.platform.modules.serviceorder.service.ServiceOrderService;
@@ -53,17 +57,160 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
     @Override
     public List<ServiceOrderResponse> listByCurrentUser() {
+        return listByCurrentUser(null);
+    }
+
+    @Override
+    public List<ServiceOrderResponse> listByCurrentUser(String status) {
+        LambdaQueryWrapper<ServiceOrder> wrapper = new LambdaQueryWrapper<ServiceOrder>()
+                .eq(ServiceOrder::getUserId, operatorContext.getUserId())
+                .orderByDesc(ServiceOrder::getId);
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            wrapper.eq(ServiceOrder::getStatus, status.trim());
+        }
         List<ServiceOrder> orders = serviceOrderMapper.selectList(
-                new LambdaQueryWrapper<ServiceOrder>()
-                        .eq(ServiceOrder::getUserId, operatorContext.getUserId())
-                        .orderByDesc(ServiceOrder::getId)
+                wrapper
         );
         return convert(orders);
     }
 
     @Override
     public List<ServiceOrderResponse> listAll() {
-        return convert(serviceOrderMapper.selectList(new LambdaQueryWrapper<ServiceOrder>().orderByDesc(ServiceOrder::getId)));
+        return listAll(null);
+    }
+
+    @Override
+    public List<ServiceOrderResponse> listAll(String status) {
+        LambdaQueryWrapper<ServiceOrder> wrapper = new LambdaQueryWrapper<ServiceOrder>().orderByDesc(ServiceOrder::getId);
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            wrapper.eq(ServiceOrder::getStatus, status.trim());
+        }
+        return convert(serviceOrderMapper.selectList(wrapper));
+    }
+
+    @Override
+    public ServiceOrderResponse detailByCurrentUser(Long orderId) {
+        return convert(getOwnedOrder(orderId));
+    }
+
+    @Override
+    public ServiceOrderResponse rejectAcceptance(Long orderId, AcceptanceRejectRequest request) {
+        ServiceOrder order = getOwnedOrder(orderId);
+        if (!"waiting_acceptance".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("order is not waiting acceptance");
+        }
+        order.setStatus("processing");
+        order.setRejectReason(request.getReason().trim());
+        order.setUpdatedAt(LocalDateTime.now());
+        serviceOrderMapper.updateById(order);
+        return convert(order);
+    }
+
+    @Override
+    public ServiceOrderResponse adminDetail(Long orderId) {
+        return convert(getOrder(orderId));
+    }
+
+    @Override
+    public List<ServiceOrderResponse> listByCurrentEngineer() {
+        return listByCurrentEngineer(null);
+    }
+
+    @Override
+    public List<ServiceOrderResponse> listByCurrentEngineer(String status) {
+        EngineerProfile profile = engineerProfileMapper.selectOne(new LambdaQueryWrapper<EngineerProfile>()
+                .eq(EngineerProfile::getUserId, operatorContext.getUserId())
+                .last("limit 1"));
+        if (profile == null) {
+            throw new BusinessException("engineer profile not found");
+        }
+        LambdaQueryWrapper<ServiceOrder> wrapper = new LambdaQueryWrapper<ServiceOrder>()
+                .eq(ServiceOrder::getEngineerId, profile.getId())
+                .orderByDesc(ServiceOrder::getId);
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            wrapper.eq(ServiceOrder::getStatus, status.trim());
+        }
+        return convert(serviceOrderMapper.selectList(wrapper));
+    }
+
+    @Override
+    public ServiceOrderResponse detailByCurrentEngineer(Long orderId) {
+        return convert(getEngineerOwnedOrder(orderId));
+    }
+
+    @Override
+    public ServiceOrderResponse updateByCurrentEngineer(Long orderId, UpdateServiceOrderStatusRequest request) {
+        ServiceOrder order = getEngineerOwnedOrder(orderId);
+        String status = request.getStatus().trim().toLowerCase();
+        if (!"processing".equals(status) && !"waiting_acceptance".equals(status)) {
+            throw new BusinessException("engineer can only update to processing or waiting_acceptance");
+        }
+        if ("processing".equals(status) && !"assigned".equalsIgnoreCase(order.getStatus()) && !"processing".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("order cannot move to processing");
+        }
+        if ("waiting_acceptance".equals(status) && !"processing".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("order must be processing before acceptance request");
+        }
+        if ("waiting_acceptance".equals(status) && (request.getDeliveryNote() == null || request.getDeliveryNote().trim().isEmpty())) {
+            throw new BusinessException("delivery note is required when requesting acceptance");
+        }
+        order.setStatus(status);
+        if (request.getDeliveryNote() != null && !request.getDeliveryNote().trim().isEmpty()) {
+            order.setDeliveryNote(request.getDeliveryNote().trim());
+        }
+        if (request.getDeliveryAttachmentUrl() != null && !request.getDeliveryAttachmentUrl().trim().isEmpty()) {
+            order.setDeliveryAttachmentUrl(request.getDeliveryAttachmentUrl().trim());
+        }
+        order.setUpdatedAt(LocalDateTime.now());
+        serviceOrderMapper.updateById(order);
+        return convert(order);
+    }
+
+    @Override
+    public ServiceOrderResponse rejectByCurrentEngineer(Long orderId, EngineerRejectOrderRequest request) {
+        ServiceOrder order = getEngineerOwnedOrder(orderId);
+        if (!"assigned".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("only assigned orders can be rejected");
+        }
+        order.setStatus("pending_dispatch");
+        order.setRejectReason(request.getReason().trim());
+        order.setEngineerId(null);
+        order.setUpdatedAt(LocalDateTime.now());
+        serviceOrderMapper.updateById(order);
+        return convert(order);
+    }
+
+    @Override
+    public ServiceOrderResponse adminUpdateStatus(Long orderId, UpdateServiceOrderStatusRequest request) {
+        ServiceOrder order = getOrder(orderId);
+        String status = request.getStatus().trim().toLowerCase();
+        if (!"assigned".equals(status) && !"processing".equals(status) && !"waiting_acceptance".equals(status)
+                && !"completed".equals(status) && !"cancelled".equals(status)) {
+            throw new BusinessException("unsupported status");
+        }
+        order.setStatus(status);
+        if (request.getDeliveryNote() != null) {
+            order.setDeliveryNote(request.getDeliveryNote());
+        }
+        if (request.getDeliveryAttachmentUrl() != null) {
+            order.setDeliveryAttachmentUrl(request.getDeliveryAttachmentUrl());
+        }
+        if ("completed".equals(status)) {
+            order.setCompletedAt(LocalDateTime.now());
+        }
+        order.setUpdatedAt(LocalDateTime.now());
+        serviceOrderMapper.updateById(order);
+        return convert(order);
+    }
+
+    @Override
+    public ServiceOrderResponse createDispute(Long orderId, DisputeRequest request) {
+        ServiceOrder order = getOrder(orderId);
+        order.setStatus("disputed");
+        order.setDisputeReason(request.getReason().trim());
+        order.setUpdatedAt(LocalDateTime.now());
+        serviceOrderMapper.updateById(order);
+        return convert(order);
     }
 
     @Override
@@ -72,6 +219,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         ServiceOrder order = getOrder(orderId);
         if ("completed".equalsIgnoreCase(order.getStatus()) || "cancelled".equalsIgnoreCase(order.getStatus())) {
             throw new BusinessException("order cannot be dispatched");
+        }
+        if (!"paid".equalsIgnoreCase(order.getPayStatus())) {
+            throw new BusinessException("order must be paid before dispatch");
         }
         order.setEngineerId(request.getEngineerId());
         order.setDispatcherAdminId(operatorContext.getUserId());
@@ -88,9 +238,12 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         if ("paid".equalsIgnoreCase(order.getPayStatus())) {
             throw new BusinessException("order already paid");
         }
+        if ("completed".equalsIgnoreCase(order.getStatus()) || "cancelled".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("order cannot be paid");
+        }
         order.setPayStatus("paid");
         order.setPaidAt(LocalDateTime.now());
-        order.setStatus(order.getEngineerId() == null ? "pending_dispatch" : "processing");
+        order.setStatus(order.getEngineerId() == null ? "pending_dispatch" : "assigned");
         order.setUpdatedAt(LocalDateTime.now());
         serviceOrderMapper.updateById(order);
         return convert(order);
@@ -101,6 +254,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         ServiceOrder order = getOwnedOrder(orderId);
         if (!"paid".equalsIgnoreCase(order.getPayStatus())) {
             throw new BusinessException("order is not paid");
+        }
+        if (!"waiting_acceptance".equalsIgnoreCase(order.getStatus())) {
+            throw new BusinessException("order is not waiting acceptance");
         }
         order.setStatus("completed");
         order.setCompletedAt(LocalDateTime.now());
@@ -122,6 +278,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         response.setStatus(order.getStatus());
         response.setPayStatus(order.getPayStatus());
         response.setDispatchRemark(order.getDispatchRemark());
+        response.setDeliveryNote(order.getDeliveryNote());
+        response.setDeliveryAttachmentUrl(order.getDeliveryAttachmentUrl());
+        response.setRejectReason(order.getRejectReason());
+        response.setDisputeReason(order.getDisputeReason());
         return response;
     }
 
@@ -143,6 +303,17 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private ServiceOrder getOwnedOrder(Long orderId) {
         ServiceOrder order = getOrder(orderId);
         if (!operatorContext.getUserId().equals(order.getUserId())) {
+            throw new BusinessException("permission denied");
+        }
+        return order;
+    }
+
+    private ServiceOrder getEngineerOwnedOrder(Long orderId) {
+        ServiceOrder order = getOrder(orderId);
+        EngineerProfile profile = engineerProfileMapper.selectOne(new LambdaQueryWrapper<EngineerProfile>()
+                .eq(EngineerProfile::getUserId, operatorContext.getUserId())
+                .last("limit 1"));
+        if (profile == null || !profile.getId().equals(order.getEngineerId())) {
             throw new BusinessException("permission denied");
         }
         return order;

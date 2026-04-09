@@ -18,6 +18,7 @@ public class EngineerApplyRequest {
     private String idCardMask;
     private String certificates;
     private String intro;
+    private String caseExamples;
     @DecimalMin(value = "0.00", inclusive = true, message = "hourlyPrice must be greater than or equal to 0")
     private BigDecimal hourlyPrice;
 
@@ -67,6 +68,14 @@ public class EngineerApplyRequest {
 
     public void setIntro(String intro) {
         this.intro = intro;
+    }
+
+    public String getCaseExamples() {
+        return caseExamples;
+    }
+
+    public void setCaseExamples(String caseExamples) {
+        this.caseExamples = caseExamples;
     }
 
     public BigDecimal getHourlyPrice() {

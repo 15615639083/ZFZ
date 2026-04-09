@@ -35,6 +35,17 @@ public class ResourceController {
         return ApiResponse.success(resourceService.detail(id));
     }
 
+    @GetMapping("/downloads/me")
+    public ApiResponse<List<ResourceResponse>> myDownloads() {
+        operatorContext.requireLogin();
+        return ApiResponse.success(resourceService.listCurrentUserDownloads());
+    }
+
+    @GetMapping("/{id}/related")
+    public ApiResponse<List<ResourceResponse>> related(@PathVariable Long id) {
+        return ApiResponse.success(resourceService.relatedResources(id));
+    }
+
     @PostMapping("/{id}/download")
     public ApiResponse<DownloadResourceResponse> download(@PathVariable Long id) {
         operatorContext.requireLogin();

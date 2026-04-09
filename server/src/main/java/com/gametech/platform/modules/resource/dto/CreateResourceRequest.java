@@ -14,6 +14,7 @@ public class CreateResourceRequest {
     private String categoryName;
 
     private String description;
+    private String detailContent;
     private String coverUrl;
     private String fileUrl;
     private String fileHash;
@@ -51,6 +52,14 @@ public class CreateResourceRequest {
 
     public String getCoverUrl() {
         return coverUrl;
+    }
+
+    public String getDetailContent() {
+        return detailContent;
+    }
+
+    public void setDetailContent(String detailContent) {
+        this.detailContent = detailContent;
     }
 
     public void setCoverUrl(String coverUrl) {

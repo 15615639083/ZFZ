@@ -10,6 +10,7 @@ public class EngineerProfileResponse {
     private String skills;
     private String serviceTags;
     private String intro;
+    private String caseExamples;
     private double hourlyPrice;
     private String verificationStatus;
     private String verificationRemark;
@@ -79,6 +80,14 @@ public class EngineerProfileResponse {
 
     public void setIntro(String intro) {
         this.intro = intro;
+    }
+
+    public String getCaseExamples() {
+        return caseExamples;
+    }
+
+    public void setCaseExamples(String caseExamples) {
+        this.caseExamples = caseExamples;
     }
 
     public double getHourlyPrice() {
